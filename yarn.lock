@@ -2120,7 +2120,6 @@ __metadata:
     dotenv: "npm:^16.5.0"
     eslint: "npm:8.56.0"
     eslint-config-prettier: "npm:^10.1.5"
-    fuse.js: "npm:^7.1.0"
     globals: "npm:^16.1.0"
     jest: "npm:^29.7.0"
     mongoose: "npm:^8.14.3"
@@ -2144,9 +2143,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.149":
-  version: 1.5.152
-  resolution: "electron-to-chromium@npm:1.5.152"
-  checksum: 10/6e90f1f0f4f94aec25959e8fd6aee6558c5927acf737c9903862ffac659c9a238b603957f381eada918fd09a0af1ede2f81c6e45bbea8e152074dad0eeca47da
+  version: 1.5.154
+  resolution: "electron-to-chromium@npm:1.5.154"
+  checksum: 10/d24faa8460a13d2c11c4e17ad63a6f30e536837a89523defaaf080abc49eaa5bae4ee7488ca403e795382cb30a828eb4fde2623653594aa59e7a0478c845be88
   languageName: node
   linkType: hard
 
@@ -2679,13 +2678,6 @@ __metadata:
   version: 1.1.2
   resolution: "function-bind@npm:1.1.2"
   checksum: 10/185e20d20f10c8d661d59aac0f3b63b31132d492e1b11fcc2a93cb2c47257ebaee7407c38513efd2b35cafdf972d9beb2ea4593c1e0f3bf8f2744836928d7454
-  languageName: node
-  linkType: hard
-
-"fuse.js@npm:^7.1.0":
-  version: 7.1.0
-  resolution: "fuse.js@npm:7.1.0"
-  checksum: 10/9f9105e54372897a46cb3e04074f0db5bd0a428320d4618276a57e6142d7502235a556f05cf87aa3c5d6d9c6fdfa06b901b78379c48aa0951672ccbc4a1bfe70
   languageName: node
   linkType: hard
 

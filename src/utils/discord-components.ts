@@ -49,16 +49,15 @@ export const createRegistrationModal = (): ModalBuilder => {
     .setMinLength(3)
     .setMaxLength(50);
 
-  // Team selection input - since we can't have a select menu in a modal,
-  // we'll create a text input and validate it against team names with fuzzy search
+  // Team selection input
   const teamInput = new TextInputBuilder()
     .setCustomId('teamName')
-    .setLabel('Team Name')
+    .setLabel('Team Number')
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Enter a team name (fuzzy search enabled)')
+    .setPlaceholder('Enter your team number (1-160)')
     .setRequired(true)
-    .setMinLength(2)
-    .setMaxLength(50);
+    .setMinLength(1)
+    .setMaxLength(3);
 
   // Create action rows
   const fullNameRow = new ActionRowBuilder<TextInputBuilder>().addComponents(fullNameInput);

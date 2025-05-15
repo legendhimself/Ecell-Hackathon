@@ -20,19 +20,11 @@ import { RegistrationRequest, RegistrationStatus } from '../../models/Registrati
 import { createRegistrationModal } from '../../utils/discord-components';
 import { logger } from '../../utils/logger';
 import { config, teamNames } from '../../config/constants';
-import Fuse from 'fuse.js';
 import { RateLimiter } from '../../utils/rate-limiter';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 // Create a rate limiter instance for registrations
 const registrationLimiter = new RateLimiter(config.rateLimits.registration);
-
-// Create a fuzzy search instance for team names
-const teamFuse = new Fuse(teamNames, {
-  includeScore: true,
-  threshold: 0.4, // Lower threshold means more strict matching
-  minMatchCharLength: 2,
-});
 
 // The register command for team registration
 export const registerCommand = {
@@ -98,38 +90,20 @@ export const processRegistration = async (interaction: ModalSubmitInteraction): 
   try {
     // Get the form data
     const fullName = interaction.fields.getTextInputValue('fullName');
-    const enteredTeamName = interaction.fields.getTextInputValue('teamName');
+    const teamNumber = interaction.fields.getTextInputValue('teamName');
     const userId = interaction.user.id;
 
-    // Use fuzzy search to find the best match
-    const results = teamFuse.search(enteredTeamName);
-
-    // No matching team found
-    if (results.length === 0) {
+    // Validate that the team number exists in our list
+    if (!teamNames.includes(teamNumber)) {
       await interaction.reply({
-        content: `No matching team found. Please try again with a valid team name. You entered: "${enteredTeamName}"`,
+        content: `Invalid team number. Please try again with a valid team number. You entered: "${teamNumber}"`,
         flags: 'Ephemeral',
       });
       return;
     }
 
-    // Get the best match
-    const bestMatch = results[0];
-    const teamName = bestMatch.item;
-
-    // If it's not a perfect match, confirm with the user
-    if (enteredTeamName.toLowerCase() !== teamName.toLowerCase()) {
-      // Reply asking for confirmation without auto-selecting
-      await interaction.reply({
-        content: `Did you mean to join team **${teamName}**? Your entry "${enteredTeamName}" was similar but not exact.\n\nPlease use the \`/register\` command again and enter the team name shown above if you want to join this team.`,
-        flags: 'Ephemeral',
-      });
-
-      return;
-    }
-
-    // If it's an exact match, proceed with registration
-    await processTeamRegistration(interaction, userId, fullName, teamName);
+    // Proceed with registration
+    await processTeamRegistration(interaction, userId, fullName, teamNumber);
   } catch (error) {
     logger.error(`Error processing registration: ${error}`);
 
