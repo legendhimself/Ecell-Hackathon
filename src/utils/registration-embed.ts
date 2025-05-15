@@ -10,11 +10,13 @@
  */
 
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+
+import { ButtonIds } from './discord-components';
+
 import { teamNames } from '../config/constants';
-import { ButtonIds } from '../utils/discord-components';
 
 // Create a registration embed with team selection
-export const createRegistrationEmbed = (): { embed: EmbedBuilder; components: ActionRowBuilder<ButtonBuilder>[] } => {
+export const createRegistrationEmbed = (): { components: ActionRowBuilder<ButtonBuilder>[]; embed: EmbedBuilder } => {
   // Create the embed
   const embed = new EmbedBuilder()
     .setColor(0x0099ff)
@@ -52,7 +54,7 @@ export const createRegistrationEmbed = (): { embed: EmbedBuilder; components: Ac
 
 // Format team names in chunks to avoid Discord's 1024 character field limit
 function formatTeamList(teams: string[]): string {
-  const sortedTeams = [...teams].sort();
+  const sortedTeams = [...teams].sort((a, b) => a - b);
 
   // Each chunk will contain multiple teams
   const chunks: string[] = [];
@@ -62,18 +64,14 @@ function formatTeamList(teams: string[]): string {
     const teamEntry = `\`${team}\`, `;
 
     // If adding this team would exceed Discord's limit, start a new chunk
-    if (currentChunk.length + teamEntry.length > 1000) {
+    if (currentChunk.length + teamEntry.length > 1_000) {
       chunks.push(currentChunk);
       currentChunk = teamEntry;
-    } else {
-      currentChunk += teamEntry;
-    }
+    } else currentChunk += teamEntry;
   }
 
   // Add the last chunk if not empty
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk);
-  }
+  if (currentChunk.length > 0) chunks.push(currentChunk);
 
   // If we have multiple chunks, return them separated; otherwise return the single chunk
   return chunks.length > 1

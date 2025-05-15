@@ -8,16 +8,18 @@
  * For questions or issues, please contact the maintainers at:
  * https://github.com/E-Cell-MJCET
  */
+import process from 'node:process';
 
 import { TextChannel, Client } from 'discord.js';
+
 import { config } from '../config/constants';
 
 // Logger interface
 interface ILogger {
-  info(message: string, skipDiscord?: boolean, ...args: unknown[]): void;
-  error(message: string, skipDiscord?: boolean, ...args: unknown[]): void;
-  warn(message: string, skipDiscord?: boolean, ...args: unknown[]): void;
-  debug(message: string, ...args: unknown[]): void;
+  debug: (message: string, ...args: unknown[]) => void;
+  error: (message: string, skipDiscord?: boolean, ...args: unknown[]) => void;
+  info: (message: string, skipDiscord?: boolean, ...args: unknown[]) => void;
+  warn: (message: string, skipDiscord?: boolean, ...args: unknown[]) => void;
 }
 
 class Logger implements ILogger {
@@ -32,16 +34,13 @@ class Logger implements ILogger {
     try {
       const guild = client.guilds.cache.get(process.env.GUILD_ID as string);
       if (guild) {
-        const auditChannel = guild.channels.cache.find(
-          channel => channel.name === config.channelPrefixes.botAudit,
-        ) as TextChannel;
+        const auditChannel = guild.channels.cache.find(channel => channel.name === config.channelPrefixes.botAudit) as
+          | TextChannel
+          | undefined;
 
-        if (auditChannel) {
-          this.botAuditChannel = auditChannel;
-        }
+        if (auditChannel) this.botAuditChannel = auditChannel;
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('Error initializing logger:', error);
     }
   }
@@ -57,7 +56,6 @@ class Logger implements ILogger {
       try {
         await this.botAuditChannel.send(`[${level}] ${message}`);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Error logging to audit channel:', error);
       }
     }

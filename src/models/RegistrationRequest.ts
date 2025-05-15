@@ -10,24 +10,25 @@
  */
 
 import mongoose, { Document, Schema } from 'mongoose';
+
 import { teamNames } from '../config/constants';
 
 // Registration status enum
 export enum RegistrationStatus {
-  PENDING = 'pending',
   APPROVED = 'approved',
+  PENDING = 'pending',
   REJECTED = 'rejected',
 }
 
 // Registration request interface
 export interface IRegistrationRequest extends Document {
-  userId: string;
-  fullName: string;
-  teamName: string;
-  status: RegistrationStatus;
-  rejectionReason?: string;
   createdAt: Date;
+  fullName: string;
+  rejectionReason?: string;
+  status: RegistrationStatus;
+  teamName: string;
   updatedAt: Date;
+  userId: string;
 }
 
 // Registration request schema

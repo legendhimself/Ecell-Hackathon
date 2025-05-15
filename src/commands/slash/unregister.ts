@@ -9,12 +9,14 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+
+import { config } from '../../config/constants';
 import { RegistrationRequest, RegistrationStatus } from '../../models/RegistrationRequest';
 import { Team } from '../../models/Team';
 import { logger } from '../../utils/logger';
-import { config } from '../../config/constants';
-import { setTimeout as sleep } from 'node:timers/promises';
 
 // The unregister command for leaving a team
 export const unregisterCommand = {

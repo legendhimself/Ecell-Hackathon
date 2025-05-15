@@ -9,41 +9,38 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import { ButtonInteraction, Client } from 'discord.js';
-import { ButtonIds, createRejectionModal } from '../utils/discord-components';
+
 import { RegistrationRequest, RegistrationStatus } from '../models/RegistrationRequest';
 import { Team } from '../models/Team';
+import { ButtonIds, createRejectionModal } from '../utils/discord-components';
 import { logger } from '../utils/logger';
-import { setTimeout as sleep } from 'node:timers/promises';
 
 // Handle button interactions
 export const handleButtonInteraction = async (interaction: ButtonInteraction, client: Client): Promise<void> => {
   // Extract the button ID and user ID from the custom ID
   const [buttonId, userId] = interaction.customId.split('_');
   try {
-    if (buttonId === ButtonIds.APPROVE_REGISTRATION) {
-      await handleApproveRegistration(interaction, userId, client);
-    } else if (buttonId === ButtonIds.REJECT_REGISTRATION) {
-      await handleRejectRegistration(interaction, userId);
-    }
+    if (buttonId === ButtonIds.APPROVE_REGISTRATION) await handleApproveRegistration(interaction, userId, client);
+    else if (buttonId === ButtonIds.REJECT_REGISTRATION) await handleRejectRegistration(interaction, userId);
   } catch (error: any) {
     logger.error(`Error handling button interaction: ${error}`);
 
     // Check if the interaction has already been replied to
-    if (interaction.replied || interaction.deferred) {
+    if (interaction.replied || interaction.deferred)
       await interaction.followUp({ content: 'There was an error processing your request.', flags: 'Ephemeral' });
-    } else {
-      await interaction.reply({ content: 'There was an error processing your request.', flags: 'Ephemeral' });
-    }
+    else await interaction.reply({ content: 'There was an error processing your request.', flags: 'Ephemeral' });
   }
 };
 
 // Handle approval of registration
-const handleApproveRegistration = async (
+async function handleApproveRegistration(
   interaction: ButtonInteraction,
   userId: string,
   client: Client,
-): Promise<void> => {
+): Promise<void> {
   // Defer the reply
   await interaction.deferUpdate();
 
@@ -123,13 +120,11 @@ const handleApproveRegistration = async (
     // Send a DM to the user
     try {
       await sleep(400); // Adding sleep to avoid rate limiting
-      const user = await client.users.fetch(userId);
+      const user = await client.users.fetch(userId).catch(() => null);
       if (user) {
         let message = `Congratulations! Your registration for team **${registrationRequest.teamName}** has been approved.`;
 
-        if (voiceChannel) {
-          message += `\n\nYou can join your team's voice channel here: <#${voiceChannel.id}>`;
-        }
+        if (voiceChannel) message += `\n\nYou can join your team's voice channel here: <#${voiceChannel.id}>`;
 
         await user.send(message);
       }
@@ -139,13 +134,13 @@ const handleApproveRegistration = async (
 
     // Edit the original message to show it's been approved
     // Get the original message component
-    const message = await interaction.message;
-    if (message) {
+    const message = interaction.message;
+    try {
       await message.edit({
         content: `Registration request for <@${userId}> (${registrationRequest.fullName}) for team **${registrationRequest.teamName}** has been **APPROVED** by <@${interaction.user.id}>.`,
         components: [], // Remove the buttons
       });
-    } else {
+    } catch {
       await interaction.followUp({
         content: `Failed to update the original message, but registration for <@${userId}> has been approved successfully.`,
         flags: 'Ephemeral',
@@ -159,10 +154,10 @@ const handleApproveRegistration = async (
     logger.error(`Error approving registration: ${error}`);
     await interaction.followUp({ content: 'There was an error processing the approval.', flags: 'Ephemeral' });
   }
-};
+}
 
 // Handle rejection of registration
-const handleRejectRegistration = async (interaction: ButtonInteraction, userId: string): Promise<void> => {
+async function handleRejectRegistration(interaction: ButtonInteraction, userId: string): Promise<void> {
   try {
     // Find the latest pending registration request for the user
     const registrationRequest = await RegistrationRequest.findOne(
@@ -187,4 +182,4 @@ const handleRejectRegistration = async (interaction: ButtonInteraction, userId: 
     logger.error(`Error showing rejection modal: ${error}`);
     await interaction.reply({ content: 'There was an error processing the rejection.', flags: 'Ephemeral' });
   }
-};
+}

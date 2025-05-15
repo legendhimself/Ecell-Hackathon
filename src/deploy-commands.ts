@@ -8,9 +8,11 @@
  * For questions or issues, please contact the maintainers at:
  * https://github.com/E-Cell-MJCET
  */
+import process from 'node:process';
 
 import { REST, Routes, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { config } from 'dotenv';
+
 import { commands } from './commands';
 import { SlashCommand } from './commands/types';
 
@@ -21,7 +23,6 @@ config();
 const { DISCORD_TOKEN, CLIENT_ID, GUILD_ID } = process.env;
 
 if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID) {
-  // eslint-disable-next-line no-console
   console.error('Missing required environment variables');
   process.exit(1);
 }
@@ -36,7 +37,7 @@ async function deployCommands() {
 
     // Convert commands to JSON
     const commandsData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = Array.from(commands.values()).map(command =>
-      (command as SlashCommand).data.toJSON(),
+      command.data.toJSON(),
     );
 
     // Deploy to guild
@@ -50,4 +51,4 @@ async function deployCommands() {
 }
 
 // Run the deployment
-deployCommands();
+void deployCommands();

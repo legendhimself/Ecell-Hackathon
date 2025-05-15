@@ -10,6 +10,7 @@
  */
 
 import { SlashCommandBuilder, ChatInputCommandInteraction, Client } from 'discord.js';
+
 import { logger } from '../../utils/logger';
 
 // The ping command for health check
@@ -27,18 +28,16 @@ export const pingCommand = {
       const wsLatency = client.ws.ping;
 
       await interaction.editReply(
-        '🏓 Pong!\n' + `Roundtrip latency: ${roundTripLatency}ms\n` + `WebSocket latency: ${wsLatency}ms`,
+        `🏓 Pong!\nRoundtrip latency: ${roundTripLatency}ms\nWebSocket latency: ${wsLatency}ms`,
       );
 
       logger.debug(`Ping command executed by ${interaction.user.id}`);
     } catch (error) {
       logger.error(`Error in ping command: ${error}`);
 
-      if (interaction.replied || interaction.deferred) {
+      if (interaction.replied || interaction.deferred)
         await interaction.editReply('An error occurred while checking bot health.');
-      } else {
-        await interaction.reply({ content: 'An error occurred while checking bot health.', flags: 'Ephemeral' });
-      }
+      else await interaction.reply({ content: 'An error occurred while checking bot health.', flags: 'Ephemeral' });
     }
   },
 };

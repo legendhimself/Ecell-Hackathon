@@ -9,6 +9,8 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
@@ -18,10 +20,10 @@ import {
   TextChannel,
   Client,
 } from 'discord.js';
+
 import { teamNames, config } from '../../config/constants';
 import { Team } from '../../models/Team';
 import { logger } from '../../utils/logger';
-import { setTimeout as sleep } from 'node:timers/promises';
 // The setup command for initializing the hackathon Discord server
 export const setupCommand = {
   data: new SlashCommandBuilder()
@@ -74,13 +76,12 @@ async function createTeamModels(): Promise<void> {
     // Check if team already exists
     const existingTeam = await Team.findOne({ teamName });
 
-    if (!existingTeam) {
+    if (existingTeam) logger.info(`Team model for ${teamName} already exists`, true);
+    else {
       await sleep(400); // Adding sleep to avoid rate limiting
       // Create new team
       await Team.create({ teamName, members: [] });
       logger.info(`Created team model for ${teamName}`, true);
-    } else {
-      logger.info(`Team model for ${teamName} already exists`, true);
     }
   }
 }
@@ -95,7 +96,8 @@ async function createTeamRoles(guild: Guild): Promise<void> {
     // Check if role already exists
     let role = guild.roles.cache.find(r => r.name === roleName);
 
-    if (!role) {
+    if (role) logger.info(`Role for ${teamName} already exists`, true);
+    else {
       await sleep(400);
       // Create role with random color
       role = await guild.roles
@@ -110,8 +112,6 @@ async function createTeamRoles(guild: Guild): Promise<void> {
         });
 
       logger.info(`Created role for ${teamName}`, true);
-    } else {
-      logger.info(`Role for ${teamName} already exists`, true);
     }
   }
 }
@@ -141,10 +141,10 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
 
   // Bot-audit channel
   const botAuditChannelName = config.channelPrefixes.botAudit;
-  let botAuditChannel = guild.channels.cache.find(ch => ch.name === botAuditChannelName) as TextChannel;
+  let botAuditChannel = guild.channels.cache.find(ch => ch.name === botAuditChannelName) as TextChannel | undefined;
 
   if (!botAuditChannel) {
-    botAuditChannel = (await guild.channels.create({
+    botAuditChannel = await guild.channels.create({
       name: botAuditChannelName,
       type: ChannelType.GuildText,
       topic: 'Bot logging and audit trail',
@@ -158,17 +158,19 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
         },
       ],
-    })) as TextChannel;
+    });
 
     logger.info('Created bot-audit channel', true);
   }
 
   // Registration channel
   const registrationChannelName = config.channelPrefixes.registration;
-  let registrationChannel = guild.channels.cache.find(ch => ch.name === registrationChannelName) as TextChannel;
+  let registrationChannel = guild.channels.cache.find(ch => ch.name === registrationChannelName) as
+    | TextChannel
+    | undefined;
 
   if (!registrationChannel) {
-    registrationChannel = (await guild.channels.create({
+    registrationChannel = await guild.channels.create({
       name: registrationChannelName,
       type: ChannelType.GuildText,
       topic: 'Register for a hackathon team here',
@@ -179,7 +181,7 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           deny: [PermissionFlagsBits.SendMessages],
         },
       ],
-    })) as TextChannel;
+    });
 
     // Send registration instructions
     const { createRegistrationEmbed } = await import('../../utils/registration-embed');
@@ -195,10 +197,10 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
 
   // Mod-log channel
   const modLogChannelName = config.channelPrefixes.modLog;
-  let modLogChannel = guild.channels.cache.find(ch => ch.name === modLogChannelName) as TextChannel;
+  let modLogChannel = guild.channels.cache.find(ch => ch.name === modLogChannelName) as TextChannel | undefined;
 
   if (!modLogChannel) {
-    modLogChannel = (await guild.channels.create({
+    modLogChannel = await guild.channels.create({
       name: modLogChannelName,
       type: ChannelType.GuildText,
       topic: 'Registration approval log',
@@ -216,7 +218,7 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           ],
         },
       ],
-    })) as TextChannel;
+    });
 
     logger.info('Created mod-log channel', true);
   }
@@ -262,7 +264,8 @@ async function createTeamVoiceChannels(guild: Guild): Promise<void> {
     // Check if channel already exists
     let voiceChannel = guild.channels.cache.find(ch => ch.name === channelName);
 
-    if (!voiceChannel) {
+    if (voiceChannel) logger.info(`Voice channel for ${teamName} already exists`, true);
+    else {
       // Create private voice channel under the category
       voiceChannel = await guild.channels.create({
         name: channelName,
@@ -281,8 +284,6 @@ async function createTeamVoiceChannels(guild: Guild): Promise<void> {
       });
 
       logger.info(`Created voice channel for ${teamName}`, true);
-    } else {
-      logger.info(`Voice channel for ${teamName} already exists`, true);
     }
   }
 }

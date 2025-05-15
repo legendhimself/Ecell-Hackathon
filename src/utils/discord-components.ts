@@ -20,13 +20,14 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
+
 import { teamNames } from '../config/constants';
 
 // Button IDs
 export enum ButtonIds {
   APPROVE_REGISTRATION = 'approve-registration',
-  REJECT_REGISTRATION = 'reject-registration',
   REGISTER_TEAM = 'register-team',
+  REJECT_REGISTRATION = 'reject-registration',
 }
 
 // Modal IDs
@@ -81,7 +82,7 @@ export const createRejectionModal = (userId: string): ModalBuilder => {
     .setPlaceholder('Please provide a reason for rejecting this registration')
     .setRequired(true)
     .setMinLength(10)
-    .setMaxLength(1000);
+    .setMaxLength(1_000);
 
   // Create action row
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonInput);
@@ -120,8 +121,8 @@ export const createModeratorButtons = (userId: string): ActionRowBuilder<ButtonB
 };
 
 // Create welcome embed
-export const createWelcomeEmbed = (): EmbedBuilder => {
-  return new EmbedBuilder()
+export const createWelcomeEmbed = (): EmbedBuilder =>
+  new EmbedBuilder()
     .setColor(0x0099ff)
     .setTitle('Welcome to the Hackathon Discord Server!')
     .setDescription("We're excited to have you join us for this event!")
@@ -138,4 +139,3 @@ export const createWelcomeEmbed = (): EmbedBuilder => {
     )
     .setTimestamp()
     .setFooter({ text: 'Hackathon Bot' });
-};

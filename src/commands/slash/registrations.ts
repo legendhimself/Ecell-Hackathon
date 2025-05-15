@@ -10,6 +10,7 @@
  */
 
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+
 import { RegistrationRequest, RegistrationStatus } from '../../models/RegistrationRequest';
 import { logger } from '../../utils/logger';
 

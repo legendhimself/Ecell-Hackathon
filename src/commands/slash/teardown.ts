@@ -9,12 +9,14 @@
  * https://github.com/E-Cell-MJCET
  */
 
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, Guild } from 'discord.js';
-import { teamNames, config } from '../../config/constants';
-import { Team } from '../../models/Team';
-import { RegistrationRequest } from '../../models/RegistrationRequest';
-import { logger } from '../../utils/logger';
 import { setTimeout as sleep } from 'node:timers/promises';
+
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, Guild } from 'discord.js';
+
+import { teamNames, config } from '../../config/constants';
+import { RegistrationRequest } from '../../models/RegistrationRequest';
+import { Team } from '../../models/Team';
+import { logger } from '../../utils/logger';
 
 // The teardown command for removing hackathon Discord server setup
 export const teardownCommand = {
@@ -218,9 +220,7 @@ async function removeTeamRoles(guild: Guild, silentMode: boolean = false): Promi
 
   for (const [_, role] of otherHackathonRoles) {
     // Skip @everyone role
-    if (role.name === '@everyone') {
-      continue;
-    }
+    if (role.name === '@everyone') continue;
 
     await sleep(400); // Adding sleep to avoid rate limiting
     try {

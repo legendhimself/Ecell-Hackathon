@@ -9,15 +9,17 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import process from 'node:process';
+
 import { Client, Events, GuildMember, Interaction, ModalSubmitInteraction, TextChannel } from 'discord.js';
+
+import { handleRegisterButton } from '../buttons/register-button';
+import { handleButtonInteraction } from '../buttons/registration-handlers';
 import { commands } from '../commands';
 import { processRegistration } from '../commands/slash/register';
-import { ModalIds, createWelcomeEmbed } from '../utils/discord-components';
-import { handleButtonInteraction } from '../buttons/registration-handlers';
-import { handleRegisterButton } from '../buttons/register-button';
 import { RegistrationRequest, RegistrationStatus } from '../models/RegistrationRequest';
+import { ModalIds, createWelcomeEmbed } from '../utils/discord-components';
 import { logger } from '../utils/logger';
-
 // Initialize event handlers
 export const initializeEvents = (client: Client): void => {
   // Ready event
@@ -36,7 +38,6 @@ export const initializeEvents = (client: Client): void => {
         const command = commands.get(interaction.commandName);
 
         if (!command) {
-          // eslint-disable-next-line no-console
           console.error(`No command matching ${interaction.commandName} was found.`);
           return;
         }
@@ -51,11 +52,8 @@ export const initializeEvents = (client: Client): void => {
             ephemeral: true,
           };
 
-          if (interaction.replied || interaction.deferred) {
-            await interaction.followUp(reply);
-          } else {
-            await interaction.reply(reply);
-          }
+          if (interaction.replied || interaction.deferred) await interaction.followUp(reply);
+          else await interaction.reply(reply);
         }
       }
       // Handle button interactions
@@ -64,24 +62,18 @@ export const initializeEvents = (client: Client): void => {
         if (
           interaction.customId.startsWith('approve-registration_') ||
           interaction.customId.startsWith('reject-registration_')
-        ) {
+        )
           await handleButtonInteraction(interaction, client);
-        }
         // Check for register button
-        else if (interaction.customId === 'register-team') {
-          await handleRegisterButton(interaction);
-        }
+        else if (interaction.customId === 'register-team') await handleRegisterButton(interaction);
       }
       // Handle modal submit interactions
       else if (interaction.isModalSubmit()) {
         // Check for registration modal
-        if (interaction.customId === ModalIds.REGISTRATION) {
-          await processRegistration(interaction);
-        }
+        if (interaction.customId === ModalIds.REGISTRATION) await processRegistration(interaction);
         // Check for rejection reason modal
-        else if (interaction.customId.startsWith(`${ModalIds.REJECTION_REASON}_`)) {
+        else if (interaction.customId.startsWith(`${ModalIds.REJECTION_REASON}_`))
           await handleRejectionModalSubmit(interaction, client);
-        }
       }
     } catch (error: any) {
       logger.error('Error handling interaction:', error);
@@ -102,7 +94,7 @@ export const initializeEvents = (client: Client): void => {
         // Try to send in general channel if DM fails
         const generalChannel = member.guild.channels.cache.find(
           channel => channel.name === 'general' || channel.name === 'welcome' || channel.name === 'chat',
-        ) as TextChannel;
+        ) as TextChannel | undefined;
 
         if (generalChannel) {
           const welcomeEmbed = createWelcomeEmbed();
@@ -161,7 +153,7 @@ async function handleRejectionModalSubmit(interaction: ModalSubmitInteraction, c
     await registrationRequest.save(); // Send DM to the user
 
     try {
-      const user = await client.users.fetch(userId);
+      const user = await client.users.fetch(userId).catch(() => null);
       if (user) {
         await user.send(
           `Your registration request for team **${registrationRequest.teamName}** has been rejected.\n\n` +
@@ -174,7 +166,7 @@ async function handleRejectionModalSubmit(interaction: ModalSubmitInteraction, c
     }
 
     // Edit the original message to show it's been rejected
-    const message = await interaction.message;
+    const message = interaction.message;
     if (message) {
       await message.edit({
         content: `Registration request for <@${userId}> (${registrationRequest.fullName}) for team **${registrationRequest.teamName}** has been **REJECTED** by <@${interaction.user.id}>.\n\n**Reason:** ${rejectionReason}`,
@@ -197,7 +189,7 @@ async function handleShutdown(client: Client): Promise<void> {
   logger.info('Received shutdown signal. Shutting down gracefully...');
 
   // Destroy the client connection
-  client.destroy();
+  void client.destroy();
 
   // Close database connection
   const { closeDatabaseConnection } = await import('../utils/database');

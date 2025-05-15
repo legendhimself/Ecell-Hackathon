@@ -197,6 +197,6 @@ export const config = {
 
   // Rate limiting (in milliseconds)
   rateLimits: {
-    registration: 30 * 1000, // 30 seconds
+    registration: 30 * 1_000, // 30 seconds
   },
 };

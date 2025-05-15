@@ -10,6 +10,7 @@
  */
 
 import { ButtonInteraction } from 'discord.js';
+
 import { ButtonIds, createRegistrationModal } from '../utils/discord-components';
 import { logger } from '../utils/logger';
 

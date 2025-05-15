@@ -1,12 +1,15 @@
+import process from 'node:process';
+
 import mongoose from 'mongoose';
-import { Team } from '../src/models/Team';
-import { RegistrationRequest, RegistrationStatus } from '../src/models/RegistrationRequest';
+
 import { teamNames } from '../src/config/constants';
+import { RegistrationRequest, RegistrationStatus } from '../src/models/RegistrationRequest';
+import { Team } from '../src/models/Team';
 
 describe('MongoDB Models', () => {
   // Connect to a test database before tests
   beforeAll(async () => {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/hackathon-test';
+    const mongoUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017/hackathon-test';
     await mongoose.connect(mongoUri);
   });
 

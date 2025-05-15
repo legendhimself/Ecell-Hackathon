@@ -10,12 +10,13 @@
  */
 
 import mongoose, { Document, Schema } from 'mongoose';
+
 import { teamNames } from '../config/constants';
 
 // Team model interface
 export interface ITeam extends Document {
-  teamName: string;
   members: string[];
+  teamName: string;
 }
 
 // Team schema

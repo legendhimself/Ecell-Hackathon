@@ -8,11 +8,14 @@
  * For questions or issues, please contact the maintainers at:
  * https://github.com/E-Cell-MJCET
  */
+import process from 'node:process';
+import { setTimeout } from 'node:timers';
 
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { config } from 'dotenv';
-import { connectToDatabase } from './utils/database';
+
 import { initializeEvents } from './events/event-handler';
+import { connectToDatabase } from './utils/database';
 import { logger } from './utils/logger';
 
 // Load environment variables

@@ -9,33 +9,35 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import process from 'node:process';
+import { setTimeout } from 'node:timers';
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import mongoose from 'mongoose';
+
 import { logger } from './logger';
 
 // Maximum number of reconnection attempts
 const MAX_RETRY_ATTEMPTS = 5;
-const RETRY_INTERVAL = 5000; // 5 seconds
+const RETRY_INTERVAL = 5_000; // 5 seconds
 
 // Connect to MongoDB with retry logic
 export const connectToDatabase = async (retryAttempt = 0): Promise<void> => {
   try {
     const mongoUri = process.env.MONGODB_URI;
 
-    if (!mongoUri) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
-    }
+    if (!mongoUri) throw new Error('MONGODB_URI is not defined in environment variables');
 
     await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 5_000,
       retryWrites: true,
     });
 
     // Set up event listeners for connection issues
     mongoose.connection.on('disconnected', () => {
       logger.warn('MongoDB disconnected. Attempting to reconnect...');
-      if (retryAttempt < MAX_RETRY_ATTEMPTS) {
-        setTimeout(() => void connectToDatabase(retryAttempt + 1), RETRY_INTERVAL);
-      } else {
+      if (retryAttempt < MAX_RETRY_ATTEMPTS) setTimeout(() => void connectToDatabase(retryAttempt + 1), RETRY_INTERVAL);
+      else {
         logger.error('Failed to reconnect to MongoDB after maximum attempts');
         process.exit(1);
       }
@@ -52,7 +54,7 @@ export const connectToDatabase = async (retryAttempt = 0): Promise<void> => {
 
     if (retryAttempt < MAX_RETRY_ATTEMPTS) {
       logger.info(`Retrying connection (attempt ${retryAttempt + 1}/${MAX_RETRY_ATTEMPTS})...`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
+      await sleep(RETRY_INTERVAL);
       return connectToDatabase(retryAttempt + 1);
     } else {
       logger.error('Failed to connect to MongoDB after maximum attempts');

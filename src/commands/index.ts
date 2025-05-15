@@ -10,17 +10,18 @@
  */
 
 import { Collection } from 'discord.js';
+
+import { healthCommand } from './slash/health';
+import { pingCommand } from './slash/ping';
+import { registrationsCommand } from './slash/registrations';
 import { setupCommand } from './slash/setup';
 // import { registerCommand } from './slash/register';
 import { teamsCommand } from './slash/teams';
-import { unregisterCommand } from './slash/unregister';
-import { pingCommand } from './slash/ping';
-import { healthCommand } from './slash/health';
-import { registrationsCommand } from './slash/registrations';
 import { teardownCommand } from './slash/teardown';
+import { unregisterCommand } from './slash/unregister';
+import { SlashCommand } from './types';
 
 import { logger } from '../utils/logger';
-import { SlashCommand } from './types';
 
 // Creating a collection of commands
 const commands = new Collection<string, SlashCommand>();

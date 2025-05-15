@@ -8,9 +8,11 @@
  * For questions or issues, please contact the maintainers at:
  * https://github.com/E-Cell-MJCET
  */
+import process from 'node:process';
 
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, Client } from 'discord.js';
 import mongoose from 'mongoose';
+
 import { logger } from '../../utils/logger';
 
 // The health command for checking system status
@@ -30,9 +32,7 @@ export const healthCommand = {
       try {
         if (mongoose.connection.readyState === 1) {
           const dbStart = Date.now();
-          if (!mongoose.connection.db) {
-            throw new Error('MongoDB connection is not established.');
-          }
+          if (!mongoose.connection.db) throw new Error('MongoDB connection is not established.');
 
           await mongoose.connection.db.admin().ping();
           const dbEnd = Date.now();
@@ -63,40 +63,30 @@ export const healthCommand = {
       logger.error(`Error in health command: ${errorMessage}`);
 
       const response = { content: 'An error occurred while checking system health.', ephemeral: true };
-      if (interaction.replied || interaction.deferred) {
-        await interaction.editReply(response);
-      } else {
-        await interaction.reply(response);
-      }
+      if (interaction.replied || interaction.deferred) await interaction.editReply(response);
+      else await interaction.reply(response);
     }
   },
 };
 
 // Format uptime in a human-readable format
 function formatUptime(uptime: number | null): string {
-  if (!uptime) {
-    return 'Unknown';
-  }
+  if (!uptime) return 'Unknown';
 
-  const totalSeconds = Math.floor(uptime / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const totalSeconds = Math.floor(uptime / 1_000);
+  const days = Math.floor(totalSeconds / 86_400);
+  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
+  const minutes = Math.floor((totalSeconds % 3_600) / 60);
   const seconds = totalSeconds % 60;
 
   const parts = [];
-  if (days > 0) {
-    parts.push(`${days}d`);
-  }
-  if (hours > 0) {
-    parts.push(`${hours}h`);
-  }
-  if (minutes > 0) {
-    parts.push(`${minutes}m`);
-  }
-  if (seconds > 0 || parts.length === 0) {
-    parts.push(`${seconds}s`);
-  }
+  if (days > 0) parts.push(`${days}d`);
+
+  if (hours > 0) parts.push(`${hours}h`);
+
+  if (minutes > 0) parts.push(`${minutes}m`);
+
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
 
   return parts.join(' ');
 }
@@ -104,8 +94,8 @@ function formatUptime(uptime: number | null): string {
 // Format memory usage in a human-readable format
 function formatMemoryUsage(): string {
   const memoryUsage = process.memoryUsage();
-  const usedMB = Math.round((memoryUsage.heapUsed / 1024 / 1024) * 100) / 100;
-  const totalMB = Math.round((memoryUsage.heapTotal / 1024 / 1024) * 100) / 100;
+  const usedMB = Math.round((memoryUsage.heapUsed / 1_024 / 1_024) * 100) / 100;
+  const totalMB = Math.round((memoryUsage.heapTotal / 1_024 / 1_024) * 100) / 100;
 
   return `${usedMB}MB / ${totalMB}MB`;
 }

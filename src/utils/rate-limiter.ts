@@ -11,7 +11,7 @@
 
 // A simple in-memory rate limiter
 export class RateLimiter {
-  private attempts: Map<string, number>;
+  private readonly attempts: Map<string, number>;
   private readonly cooldown: number;
 
   constructor(cooldownMs: number) {
@@ -26,7 +26,7 @@ export class RateLimiter {
    */
   checkRateLimit(key: string): { allowed: boolean; remainingTime: number } {
     const now = Date.now();
-    const lastAttempt = this.attempts.get(key) || 0;
+    const lastAttempt = this.attempts.get(key) ?? 0;
     const timeElapsed = now - lastAttempt;
 
     if (timeElapsed < this.cooldown) {

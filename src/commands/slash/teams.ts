@@ -10,8 +10,9 @@
  */
 
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { Team } from '../../models/Team';
+
 import { teamNames } from '../../config/constants';
+import { Team } from '../../models/Team';
 import { logger } from '../../utils/logger';
 
 // The teams command to show team information
@@ -29,7 +30,7 @@ export const teamsCommand = {
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     try {
       // Get the list_all option
-      const listAll = interaction.options.getBoolean('list_all') || false;
+      const listAll = interaction.options.getBoolean('list_all') ?? false;
 
       // Defer the reply
       await interaction.deferReply({ ephemeral: listAll });
@@ -53,7 +54,7 @@ export const teamsCommand = {
 // Show all available teams
 async function showAllTeams(interaction: ChatInputCommandInteraction): Promise<void> {
   // Sort teams alphabetically
-  const sortedTeams = [...teamNames].sort();
+  const sortedTeams = [...teamNames].sort((a, b) => b - a);
 
   // Create embed
   const embed = new EmbedBuilder()
@@ -70,26 +71,22 @@ async function showAllTeams(interaction: ChatInputCommandInteraction): Promise<v
     const teamEntry = `\`${team}\`\n`;
 
     // If adding this team would exceed Discord's limit, start a new chunk
-    if (currentChunk.length + teamEntry.length > 1000) {
+    if (currentChunk.length + teamEntry.length > 1_000) {
       chunks.push(currentChunk);
       currentChunk = teamEntry;
-    } else {
-      currentChunk += teamEntry;
-    }
+    } else currentChunk += teamEntry;
   }
 
   // Add the last chunk if not empty
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk);
-  }
+  if (currentChunk.length > 0) chunks.push(currentChunk);
 
   // Add fields for each chunk
-  chunks.forEach((chunk, index) => {
+  for (const [index, chunk] of chunks.entries()) {
     embed.addFields({
       name: chunks.length > 1 ? `Teams (Part ${index + 1}/${chunks.length})` : 'Teams',
       value: chunk,
     });
-  });
+  }
 
   // Reply with the embed
   await interaction.editReply({ embeds: [embed] });

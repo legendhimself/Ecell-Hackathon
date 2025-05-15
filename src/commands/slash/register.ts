@@ -9,6 +9,8 @@
  * https://github.com/E-Cell-MJCET
  */
 
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
@@ -16,12 +18,12 @@ import {
   ModalSubmitInteraction,
   PermissionFlagsBits,
 } from 'discord.js';
+
+import { config, teamNames } from '../../config/constants';
 import { RegistrationRequest, RegistrationStatus } from '../../models/RegistrationRequest';
 import { createRegistrationModal } from '../../utils/discord-components';
 import { logger } from '../../utils/logger';
-import { config, teamNames } from '../../config/constants';
 import { RateLimiter } from '../../utils/rate-limiter';
-import { setTimeout as sleep } from 'node:timers/promises';
 
 // Create a rate limiter instance for registrations
 const registrationLimiter = new RateLimiter(config.rateLimits.registration);
@@ -61,9 +63,9 @@ export const registerCommand = {
       if (!isAdmin) {
         const rateLimit = registrationLimiter.checkRateLimit(userId);
         if (!rateLimit.allowed) {
-          const remainingSeconds = Math.ceil(rateLimit.remainingTime / 1000);
+          const remainingSeconds = Math.ceil(rateLimit.remainingTime / 1_000);
           await interaction.reply({
-            content: `Please wait ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''} before trying to register again.`,
+            content: `Please wait ${remainingSeconds} second${remainingSeconds === 1 ? '' : 's'} before trying to register again.`,
             flags: 'Ephemeral',
           });
           return;
@@ -148,7 +150,9 @@ async function processTeamRegistration(
 
   // Send notification to mod-log channel
   const guild = interaction.guild;
-  const modLogChannel = guild?.channels.cache.find(ch => ch.name === config.channelPrefixes.modLog) as TextChannel;
+  const modLogChannel = guild?.channels.cache.find(ch => ch.name === config.channelPrefixes.modLog) as
+    | TextChannel
+    | undefined;
 
   if (modLogChannel) {
     const moderatorRole = guild?.roles.cache.find(r => r.name === config.moderatorRoleName);
@@ -165,13 +169,13 @@ async function processTeamRegistration(
   }
 
   // Reply to the user
-  if (!interaction.replied) {
-    await interaction.reply({
+  if (interaction.replied) {
+    await interaction.followUp({
       content: `Your registration request for team **${teamName}** has been submitted! A moderator will review it shortly.`,
       flags: 'Ephemeral',
     });
   } else {
-    await interaction.followUp({
+    await interaction.reply({
       content: `Your registration request for team **${teamName}** has been submitted! A moderator will review it shortly.`,
       flags: 'Ephemeral',
     });
