@@ -1,0 +1,47 @@
+{
+  "name": "ecell-hackathon",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "deploy": "tsx src/deploy-commands.ts",
+    "format": "prettier --write --cache .",
+    "lint": "eslint --config eslint.config.js . --fix --cache",
+    "test": "jest --config jest.config.mjs"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "hackathon"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Discord bot for E-Cell Hackathon",
+  "dependencies": {
+    "@types/node": "^22.15.18",
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "fuse.js": "^7.1.0",
+    "mongoose": "^8.14.3",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.26.0",
+    "@types/jest": "^29.5.14",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
+    "eslint": "8.56.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.1.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.3",
+    "tsx": "^4.19.4"
+  },
+  "packageManager": "yarn@4.9.1"
+}
