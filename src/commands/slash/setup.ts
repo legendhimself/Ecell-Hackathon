@@ -24,6 +24,7 @@ import {
 import { teamNames, config } from '../../config/constants';
 import { Team } from '../../models/Team';
 import { logger } from '../../utils/logger';
+import { createRegistrationEmbed } from '../../utils/registration-embed';
 // The setup command for initializing the hackathon Discord server
 export const setupCommand = {
   data: new SlashCommandBuilder()
@@ -47,6 +48,7 @@ export const setupCommand = {
 
       // reinitialize logger with the client
       logger.initialize(client);
+      await sleep(1_000);
 
       // Step 2: Create MongoDB team models
       await createTeamModels();
@@ -62,6 +64,7 @@ export const setupCommand = {
       await interaction.editReply('Hackathon server setup complete! Teams, roles, and channels have been created.');
     } catch (error) {
       logger.error(`Error in setup command: ${error}`);
+      console.error(error);
       await interaction.editReply(`An error occurred during setup: ${error}`);
     }
   },
@@ -78,7 +81,6 @@ async function createTeamModels(): Promise<void> {
 
     if (existingTeam) logger.info(`Team model for ${teamName} already exists`, true);
     else {
-      await sleep(400); // Adding sleep to avoid rate limiting
       // Create new team
       await Team.create({ teamName, members: [] });
       logger.info(`Created team model for ${teamName}`, true);
@@ -134,6 +136,7 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
         PermissionFlagsBits.ManageChannels,
         PermissionFlagsBits.ModerateMembers,
       ],
+      position: 1, // Position it high up in the role list
     });
 
     logger.info('Created Moderators role', true);
@@ -158,6 +161,7 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
         },
       ],
+      position: 0, // Keep it at the top
     });
 
     logger.info('Created bot-audit channel', true);
@@ -181,10 +185,10 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           deny: [PermissionFlagsBits.SendMessages],
         },
       ],
+      position: 1, // Keep it at the top
     });
 
     // Send registration instructions
-    const { createRegistrationEmbed } = await import('../../utils/registration-embed');
     const { embed, components } = createRegistrationEmbed();
 
     await registrationChannel.send({
@@ -218,6 +222,7 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
           ],
         },
       ],
+      position: 2, // Keep it at the top but after registration
     });
 
     logger.info('Created mod-log channel', true);
@@ -228,29 +233,49 @@ async function createUtilityChannels(guild: Guild): Promise<void> {
 async function createTeamVoiceChannels(guild: Guild): Promise<void> {
   logger.info('Creating team voice channels...', true);
 
-  // Create a category for team voice channels if it doesn't exist
-  let category = guild.channels.cache.find(
-    ch => ch.type === ChannelType.GuildCategory && ch.name === config.categoryNames.teamVoice,
+  // Maximum number of channels per category (Discord limit is 50)
+  const MAX_CHANNELS_PER_CATEGORY = 50; // Using slightly below the limit for safety
+  const totalTeams = teamNames.length;
+  const categoriesNeeded = Math.ceil(totalTeams / MAX_CHANNELS_PER_CATEGORY);
+
+  logger.info(`Need to create ${categoriesNeeded} categories for ${totalTeams} teams`, true);
+
+  // Get the highest position of existing channels for placing categories at the bottom
+  const highestPosition = Math.max(
+    ...guild.channels.cache.filter((ch: any) => ch.position).map((ch: any) => ch.position),
+    0,
   );
 
-  if (!category) {
-    category = await guild.channels.create({
-      name: config.categoryNames.teamVoice,
-      type: ChannelType.GuildCategory,
-    });
-    logger.info(`Created voice channel category: ${config.categoryNames.teamVoice}`, true);
+  // Create all needed categories first
+  const categories = [];
+  for (let i = 0; i < categoriesNeeded; i++) {
+    const categoryName = i === 0 ? config.categoryNames.teamVoice : `${config.categoryNames.teamVoice} ${i + 1}`;
+
+    // Check if category already exists
+    let category = guild.channels.cache.find(ch => ch.type === ChannelType.GuildCategory && ch.name === categoryName);
+
+    if (category) logger.info(`Voice channel category ${categoryName} already exists`, true);
+    else {
+      await sleep(400);
+      category = await guild.channels.create({
+        name: categoryName,
+        type: ChannelType.GuildCategory,
+        position: highestPosition + i + 1, // Place at the bottom of the channel list
+      });
+      logger.info(`Created voice channel category: ${categoryName}`, true);
+    }
+
+    categories.push(category);
   }
 
-  for (const teamName of teamNames) {
+  // Distribute team channels across categories
+  for (const [i, teamName] of teamNames.entries()) {
     await sleep(400);
+    const categoryIndex = Math.floor(i / MAX_CHANNELS_PER_CATEGORY);
+    const category = categories[categoryIndex];
 
-    // Create a pretty channel name with PascalCase and emoji
-    const prettyTeamName = teamName
-      .split(/\s+/)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join('');
-
-    const channelName = `🔊 ${prettyTeamName}`;
+    // Create a pretty channel name with number formatting and emoji
+    const channelName = `🔊 Team ${teamName}`;
     const roleName = `${config.rolePrefix}${teamName}`;
 
     // Find the team role

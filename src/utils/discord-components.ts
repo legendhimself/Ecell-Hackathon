@@ -14,8 +14,6 @@ import {
   ActionRowBuilder,
   ButtonStyle,
   EmbedBuilder,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -55,7 +53,9 @@ export const createRegistrationModal = (): ModalBuilder => {
     .setCustomId('teamName')
     .setLabel('Team Number')
     .setStyle(TextInputStyle.Short)
-    .setPlaceholder('Enter your team number (1-160)')
+    .setPlaceholder(
+      `Enter your team number ( ${Math.min(...teamNames.map(t => Number.parseInt(t, 10)))} - ${Math.max(...teamNames.map(t => Number.parseInt(t, 10)))})`,
+    )
     .setRequired(true)
     .setMinLength(1)
     .setMaxLength(3);
@@ -91,18 +91,6 @@ export const createRejectionModal = (userId: string): ModalBuilder => {
   modal.addComponents(reasonRow);
 
   return modal;
-};
-
-// Create team select menu
-export const createTeamSelectMenu = (): ActionRowBuilder<StringSelectMenuBuilder> => {
-  const options = teamNames.map(team => new StringSelectMenuOptionBuilder().setLabel(team).setValue(team));
-
-  const selectMenu = new StringSelectMenuBuilder()
-    .setCustomId('teamSelect')
-    .setPlaceholder('Select a team')
-    .addOptions(options);
-
-  return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 };
 
 // Create approval/rejection buttons

@@ -18,8 +18,10 @@ import { handleButtonInteraction } from '../buttons/registration-handlers';
 import { commands } from '../commands';
 import { processRegistration } from '../commands/slash/register';
 import { RegistrationRequest, RegistrationStatus } from '../models/RegistrationRequest';
+import { closeDatabaseConnection } from '../utils/database';
 import { ModalIds, createWelcomeEmbed } from '../utils/discord-components';
 import { logger } from '../utils/logger';
+
 // Initialize event handlers
 export const initializeEvents = (client: Client): void => {
   // Ready event
@@ -192,7 +194,6 @@ async function handleShutdown(client: Client): Promise<void> {
   void client.destroy();
 
   // Close database connection
-  const { closeDatabaseConnection } = await import('../utils/database');
   await closeDatabaseConnection();
 
   // Exit with success code

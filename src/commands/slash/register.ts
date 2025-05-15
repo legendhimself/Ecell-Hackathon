@@ -21,7 +21,7 @@ import {
 
 import { config, teamNames } from '../../config/constants';
 import { RegistrationRequest, RegistrationStatus } from '../../models/RegistrationRequest';
-import { createRegistrationModal } from '../../utils/discord-components';
+import { createRegistrationModal, createModeratorButtons } from '../../utils/discord-components';
 import { logger } from '../../utils/logger';
 import { RateLimiter } from '../../utils/rate-limiter';
 
@@ -159,7 +159,6 @@ async function processTeamRegistration(
     const moderatorMention = moderatorRole ? `<@&${moderatorRole.id}>` : '@Moderators';
 
     // Send message with approve/reject buttons
-    const { createModeratorButtons } = await import('../../utils/discord-components');
     const buttons = createModeratorButtons(userId);
 
     await modLogChannel.send({
