@@ -19,9 +19,10 @@ import { setupCommand } from './slash/setup';
 import { teamsCommand } from './slash/teams';
 import { teardownCommand } from './slash/teardown';
 import { unregisterCommand } from './slash/unregister';
-import { SlashCommand } from './types';
 
 import { logger } from '../utils/logger';
+
+import type { SlashCommand } from './types';
 
 // Creating a collection of commands
 const commands = new Collection<string, SlashCommand>();

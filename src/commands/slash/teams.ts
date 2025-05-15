@@ -54,7 +54,7 @@ export const teamsCommand = {
 // Show all available teams
 async function showAllTeams(interaction: ChatInputCommandInteraction): Promise<void> {
   // Sort teams alphabetically
-  const sortedTeams = [...teamNames].sort((a, b) => b - a);
+  const sortedTeams = [...teamNames].sort((a, b) => a.localeCompare(b));
 
   // Create embed
   const embed = new EmbedBuilder()

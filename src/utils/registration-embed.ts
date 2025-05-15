@@ -54,7 +54,7 @@ export const createRegistrationEmbed = (): { components: ActionRowBuilder<Button
 
 // Format team names in chunks to avoid Discord's 1024 character field limit
 function formatTeamList(teams: string[]): string {
-  const sortedTeams = [...teams].sort((a, b) => a - b);
+  const sortedTeams = [...teams].sort((a, b) => a.localeCompare(b));
 
   // Each chunk will contain multiple teams
   const chunks: string[] = [];

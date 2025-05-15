@@ -11,7 +11,7 @@
 
 import process from 'node:process';
 
-import { Client, Events, GuildMember, Interaction, ModalSubmitInteraction, TextChannel } from 'discord.js';
+import { Client, Events, GuildMember, type Interaction, ModalSubmitInteraction, TextChannel } from 'discord.js';
 
 import { handleRegisterButton } from '../buttons/register-button';
 import { handleButtonInteraction } from '../buttons/registration-handlers';

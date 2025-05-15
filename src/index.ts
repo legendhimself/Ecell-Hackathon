@@ -9,7 +9,6 @@
  * https://github.com/E-Cell-MJCET
  */
 import process from 'node:process';
-import { setTimeout } from 'node:timers';
 
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { config } from 'dotenv';
@@ -51,11 +50,13 @@ initializeEvents(client);
 connectToDatabase()
   .then(() => {
     // Login to Discord
+    // eslint-disable-next-line promise/prefer-await-to-then, promise/prefer-await-to-callbacks
     client.login(DISCORD_TOKEN).catch(error => {
       logger.error('Error logging in to Discord:', error);
       process.exit(1);
     });
   })
+  // eslint-disable-next-line promise/prefer-await-to-callbacks
   .catch(error => {
     logger.error('Failed to start the application:', error);
     process.exit(1);

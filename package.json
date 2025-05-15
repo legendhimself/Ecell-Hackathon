@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/src/index.js",
-    "dev": "tsx src/index.ts",
-    "build": "tsc",
-    "deploy": "tsx src/deploy-commands.ts",
+    "dev": "tsup --watch --onSuccess \"yarn start\"",
+    "build": "tsup",
+    "start": "node --enable-source-maps .",
+    "deploy": "node -r @swc-node/register src/deploy-commands.ts",
     "format": "prettier --write --cache .",
     "lint": "eslint . --fix --cache",
-    "test": "jest --config jest.config.mjs"
+    "test": "jest --config jest.config.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "discord",
@@ -20,20 +21,22 @@
   "license": "ISC",
   "description": "Discord bot for E-Cell Hackathon",
   "dependencies": {
+    "@swc/helpers": "^0.5.17",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "mongoose": "^8.14.3"
   },
   "devDependencies": {
+    "@swc-node/jest": "^1.8.13",
+    "@swc-node/register": "^1.10.10",
+    "@swc/core": "^1.11.24",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.18",
     "eslint": "9.26.0",
     "eslint-config-mahir": "^1.0.7",
     "jest": "^29.7.0",
     "prettier": "^3.5.3",
-    "ts-jest": "^29.3.3",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
+    "tsup": "^8.4.0",
     "typescript": "^5.8.3"
   },
   "packageManager": "yarn@4.9.1"

@@ -10,11 +10,10 @@
  */
 import process from 'node:process';
 
-import { REST, Routes, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
+import { REST, Routes, type RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 import { config } from 'dotenv';
 
 import { commands } from './commands';
-import { SlashCommand } from './commands/types';
 
 // Load environment variables
 config();

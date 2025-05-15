@@ -63,17 +63,17 @@ class Logger implements ILogger {
 
   public info(message: string, skipDiscord: boolean = false, ...args: unknown[]): void {
     this.logToConsole('INFO', message, ...args);
-    this.logToChannel('INFO', message, skipDiscord);
+    void this.logToChannel('INFO', message, skipDiscord);
   }
 
   public error(message: string, skipDiscord: boolean = false, ...args: unknown[]): void {
     this.logToConsole('ERROR', message, ...args);
-    this.logToChannel('ERROR', message, skipDiscord);
+    void this.logToChannel('ERROR', message, skipDiscord);
   }
 
   public warn(message: string, skipDiscord: boolean = false, ...args: unknown[]): void {
     this.logToConsole('WARN', message, ...args);
-    this.logToChannel('WARN', message, skipDiscord);
+    void this.logToChannel('WARN', message, skipDiscord);
   }
 
   public debug(message: string, ...args: unknown[]): void {
