@@ -84,7 +84,7 @@ export const initializeEvents = (client: Client): void => {
         }
       }
     } catch (error: any) {
-      logger.error(`Error handling interaction:`, error);
+      logger.error('Error handling interaction:', error);
     }
   });
 
@@ -113,7 +113,7 @@ export const initializeEvents = (client: Client): void => {
         }
       }
     } catch (error: any) {
-      logger.error(`Error handling new member:`, error);
+      logger.error('Error handling new member:', error);
     }
   });
 
@@ -166,7 +166,7 @@ async function handleRejectionModalSubmit(interaction: ModalSubmitInteraction, c
         await user.send(
           `Your registration request for team **${registrationRequest.teamName}** has been rejected.\n\n` +
             `**Reason:** ${rejectionReason}\n\n` +
-            `You can register for a different team using the \`/register\` command.`,
+            'You can register for a different team using the `/register` command.',
         );
       }
     } catch (error: any) {
@@ -187,7 +187,7 @@ async function handleRejectionModalSubmit(interaction: ModalSubmitInteraction, c
     // Reply to the moderator
     await interaction.reply({ content: 'Registration request has been rejected.', flags: 'Ephemeral' });
   } catch (error: any) {
-    logger.error(`Error handling rejection modal:`, false, error);
+    logger.error('Error handling rejection modal:', false, error);
     await interaction.reply({ content: 'An error occurred while processing the rejection.', flags: 'Ephemeral' });
   }
 }

@@ -27,7 +27,7 @@ export const pingCommand = {
       const wsLatency = client.ws.ping;
 
       await interaction.editReply(
-        `🏓 Pong!\n` + `Roundtrip latency: ${roundTripLatency}ms\n` + `WebSocket latency: ${wsLatency}ms`,
+        '🏓 Pong!\n' + `Roundtrip latency: ${roundTripLatency}ms\n` + `WebSocket latency: ${wsLatency}ms`,
       );
 
       logger.debug(`Ping command executed by ${interaction.user.id}`);

@@ -4,13 +4,17 @@ A TypeScript-based Discord bot for managing an online hackathon on Discord, buil
 
 ## Features
 
-### Setup
+### Setup and Teardown
 
 - `/setup` - Administrator command to set up the hackathon Discord server
   - Creates MongoDB Team schema/model with team names
   - Creates Discord roles for each team
   - Creates private voice channels for teams
   - Creates registration and mod-log channels
+- `/teardown` - Administrator command to remove all hackathon setup
+  - Removes team roles
+  - Deletes team channels
+  - Cleans up database entries
 
 ### Registration System
 
@@ -18,22 +22,27 @@ A TypeScript-based Discord bot for managing an online hackathon on Discord, buil
   - Opens a modal for name and team selection
   - Notifies moderators of new registrations
   - Handles rate limiting to prevent spam
+- `/unregister` - Allows users to leave their current team
 
 ### Moderation
 
 - Approve/Reject buttons for moderators
 - DM notifications for users when their requests are handled
 - Mod-log channel for transparent registration tracking
+- `/registrations` - Shows registration statistics for moderators
 
 ### Team Management
 
 - `/teams` - View team information and member counts
-- `/unregister` - Leave your current team
 - Private voice channels for team collaboration
 
-### Utilities
+### System Monitoring
 
-- `/ping` - Health check command and latency information
+- `/health` - Comprehensive health check for the bot and database systems
+  - Shows Discord API latency and connection status
+  - Shows database connection status and response time
+  - Returns overall system health status
+- `/ping` - Quick latency check for Discord connection
 - Audit logging for all major actions
 - Graceful shutdown handling
 
@@ -42,7 +51,7 @@ A TypeScript-based Discord bot for managing an online hackathon on Discord, buil
 1. Clone this repository
 2. Install dependencies:
    ```
-   npm install
+   yarn install
    ```
 3. Create a `.env` file with the following variables:
    ```
@@ -53,22 +62,34 @@ A TypeScript-based Discord bot for managing an online hackathon on Discord, buil
    ```
 4. Build the project:
    ```
-   npm run build
+   yarn build
    ```
 5. Deploy slash commands:
    ```
-   npm run deploy
+   yarn deploy
    ```
 6. Start the bot:
    ```
-   npm start
+   yarn start
    ```
 
 ## Development
 
-- Run in development mode:
+- Run in development mode with hot reloading:
   ```
-  npm run dev
+  yarn dev
+  ```
+- Format code with Prettier:
+  ```
+  yarn format
+  ```
+- Run linting:
+  ```
+  yarn lint
+  ```
+- Run tests:
+  ```
+  yarn test
   ```
 
 ## Customization
@@ -79,4 +100,4 @@ You can customize team names and channel prefixes by editing the `src/config/con
 
 - Node.js 16.9.0 or higher
 - MongoDB database
-- Discord Bot token with proper intents enabled
+- Discord Bot token with proper intents enabled (Gateway Intents: Server Members, Message Content)
