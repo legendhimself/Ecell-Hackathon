@@ -35,7 +35,7 @@ export const createRegistrationEmbed = (): { components: ActionRowBuilder<Button
         value: `Please enter a team number between ${Math.min(...teamNames.map(t => Number.parseInt(t, 10)))} - ${Math.max(...teamNames.map(t => Number.parseInt(t, 10)))}.`,
       },
     )
-    .setFooter({ text: 'If you make a typo, your application will be and you can register again.' })
+    .setFooter({ text: 'If you make a typo, your application will be rejected and you can register again.' })
     .setTimestamp();
 
   // Create the register button

@@ -248,21 +248,60 @@ async function createTeamVoiceChannels(guild: Guild): Promise<void> {
 
   // Create all needed categories first
   const categories = [];
+
+  // Force a complete fetch of all guild channels
+  const fetchedChannels = await guild.channels.fetch();
+
   for (let i = 0; i < categoriesNeeded; i++) {
     const categoryName = i === 0 ? config.categoryNames.teamVoice : `${config.categoryNames.teamVoice} ${i + 1}`;
 
-    // Check if category already exists
-    let category = guild.channels.cache.find(ch => ch.type === ChannelType.GuildCategory && ch.name === categoryName);
+    // Function to normalize category names (remove all emojis and trim whitespace)
+    const normalizeText = (text: string): string => {
+      // Remove all emojis completely, including variation selectors
+      return text
+        .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}]/gu, '')
+        .replace(/[\u{1F300}-\u{1F6FF}]/gu, '')
+        .replace(/\s+/g, ' ') // normalize multiple spaces to single space
+        .trim();
+    };
 
-    if (category) logger.info(`Voice channel category ${categoryName} already exists`, true);
-    else {
+    // Normalize the name we're searching for
+    const normalizedSearchName = normalizeText(categoryName);
+
+    // Use the fetched channels directly with a more flexible comparison
+    let category = fetchedChannels.find(ch => {
+      if (ch === null || ch.type !== ChannelType.GuildCategory) return false;
+
+      // Try exact match first
+      if (ch.name === categoryName) return true;
+
+      // Try normalized comparison
+      const normalizedChannelName = normalizeText(ch.name);
+
+      // Do a basic text comparison after normalization
+      return (
+        normalizedChannelName === normalizedSearchName ||
+        (normalizedChannelName.includes('Team Voice Channels') &&
+          ((i === 0 &&
+            !normalizedChannelName.includes('2') &&
+            !normalizedChannelName.includes('3') &&
+            !normalizedChannelName.includes('4')) ||
+            normalizedChannelName.includes(`${i + 1}`)))
+      );
+    });
+
+    if (category) {
+      logger.info(`Voice channel category "${categoryName}" already exists with ID: ${category.id}`, true);
+      logger.info(`Found existing category with name: "${category.name}"`, true);
+    } else {
+      logger.info(`No existing category found for "${categoryName}", creating new one...`, true);
       await sleep(400);
       category = await guild.channels.create({
         name: categoryName,
         type: ChannelType.GuildCategory,
         position: highestPosition + i + 1, // Place at the bottom of the channel list
       });
-      logger.info(`Created voice channel category: ${categoryName}`, true);
+      logger.info(`Created voice channel category: "${categoryName}" with ID: ${category.id}`, true);
     }
 
     categories.push(category);
@@ -286,11 +325,37 @@ async function createTeamVoiceChannels(guild: Guild): Promise<void> {
       continue;
     }
 
-    // Check if channel already exists
-    let voiceChannel = guild.channels.cache.find(ch => ch.name === channelName);
+    // Function to normalize channel names (remove emojis and trim whitespace)
+    const normalizeText = (text: string): string => {
+      // Remove all emojis completely, including variation selectors
+      return text
+        .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}]/gu, '')
+        .replace(/[\u{1F300}-\u{1F6FF}]/gu, '')
+        .replace(/\s+/g, ' ') // normalize multiple spaces to single space
+        .trim();
+    };
+    const normalizedSearchName = normalizeText(channelName);
 
-    if (voiceChannel) logger.info(`Voice channel for ${teamName} already exists`, true);
-    else {
+    // Check if channel already exists using more flexible comparison
+    let voiceChannel = fetchedChannels.find(ch => {
+      if (ch === null || ch.type !== ChannelType.GuildVoice) return false;
+
+      // Try exact match first
+      if (ch.name === channelName) return true;
+
+      // Try normalized comparison
+      const normalizedChannelName = normalizeText(ch.name);
+
+      // Compare the normalized names
+      return (
+        normalizedChannelName === normalizedSearchName ||
+        (normalizedChannelName.includes('Team') && normalizedChannelName.includes(teamName))
+      );
+    });
+
+    if (voiceChannel) {
+      logger.info(`Voice channel for ${teamName} already exists with ID: ${voiceChannel.id}`, true);
+    } else {
       // Create private voice channel under the category
       voiceChannel = await guild.channels.create({
         name: channelName,
@@ -308,7 +373,7 @@ async function createTeamVoiceChannels(guild: Guild): Promise<void> {
         ],
       });
 
-      logger.info(`Created voice channel for ${teamName}`, true);
+      logger.info(`Created voice channel for ${teamName} with ID: ${voiceChannel.id}`, true);
     }
   }
 }
