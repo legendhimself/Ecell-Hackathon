@@ -24,17 +24,10 @@ export const createRegistrationEmbed = (): { components: ActionRowBuilder<Button
     .setDescription(
       'Register for a hackathon team by clicking the button below. You will be prompted to enter your details.',
     )
-    .addFields(
-      {
-        name: '🔍 Available Teams',
-        value:
-          'Here are all available teams you can join. You can copy one of these names or use a similar name (fuzzy search is enabled).',
-      },
-      {
-        name: 'Team Range',
-        value: `Please enter a team number between ${Math.min(...teamNames.map(t => Number.parseInt(t, 10)))} - ${Math.max(...teamNames.map(t => Number.parseInt(t, 10)))}.`,
-      },
-    )
+    .addFields({
+      name: 'Team Range',
+      value: `Please enter a team number between ${Math.min(...teamNames.map(t => Number.parseInt(t, 10)))} - ${Math.max(...teamNames.map(t => Number.parseInt(t, 10)))}.`,
+    })
     .setFooter({ text: 'If you make a typo, your application will be rejected and you can register again.' })
     .setTimestamp();
 

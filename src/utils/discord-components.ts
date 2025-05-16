@@ -117,7 +117,7 @@ export const createWelcomeEmbed = (): EmbedBuilder =>
     .addFields(
       {
         name: 'Getting Started',
-        value: 'Please register for a team using the `/register` command or by visiting the registration channel.',
+        value: 'Please register for a team using the by visiting the registration channel.',
       },
       {
         name: 'Team Registration',

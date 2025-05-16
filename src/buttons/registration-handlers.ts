@@ -81,6 +81,7 @@ async function handleApproveRegistration(
     // Find the team role by name
     const teamRoleName = `Team-${registrationRequest.teamName}`;
     const role = guild.roles.cache.find(r => r.name === teamRoleName);
+    const participantRole = guild.roles.cache.find(r => r.id === '1370167939013021767');
 
     if (!role) {
       await interaction.followUp({ content: `Team role '${teamRoleName}' not found.`, flags: 'Ephemeral' });
@@ -89,7 +90,7 @@ async function handleApproveRegistration(
 
     // Assign the role
     await sleep(400); // Adding sleep to avoid rate limiting
-    await member.roles.add(role);
+    await member.roles.add([role, participantRole!]);
 
     // Update the registration request status
     await sleep(400); // Adding sleep to avoid rate limiting

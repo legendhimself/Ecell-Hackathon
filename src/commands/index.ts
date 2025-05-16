@@ -16,7 +16,6 @@ import { pingCommand } from './slash/ping';
 import { registrationsCommand } from './slash/registrations';
 import { setupCommand } from './slash/setup';
 // import { registerCommand } from './slash/register';
-import { teamsCommand } from './slash/teams';
 import { teardownCommand } from './slash/teardown';
 import { unregisterCommand } from './slash/unregister';
 
@@ -30,7 +29,6 @@ const commands = new Collection<string, SlashCommand>();
 // Add all commands to the collection
 commands.set(setupCommand.data.name, setupCommand);
 // commands.set(registerCommand.data.name, registerCommand);
-commands.set(teamsCommand.data.name, teamsCommand as unknown as SlashCommand);
 commands.set(unregisterCommand.data.name, unregisterCommand);
 commands.set(pingCommand.data.name, pingCommand);
 commands.set(healthCommand.data.name, healthCommand);

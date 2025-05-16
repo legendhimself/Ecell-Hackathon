@@ -76,7 +76,7 @@ export const unregisterCommand = {
 
       // Reply to the user
       await interaction.reply({
-        content: `You have successfully left team **${teamName}**. You can register for a new team with the \`/register\` command.`,
+        content: `You have successfully left team **${teamName}**. You can register for a new team <#1372921837058789520> in the channel.`,
         flags: 'Ephemeral',
       });
     } catch (error) {

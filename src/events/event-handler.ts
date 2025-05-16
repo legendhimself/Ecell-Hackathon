@@ -160,7 +160,7 @@ async function handleRejectionModalSubmit(interaction: ModalSubmitInteraction, c
         await user.send(
           `Your registration request for team **${registrationRequest.teamName}** has been rejected.\n\n` +
             `**Reason:** ${rejectionReason}\n\n` +
-            'You can register for a different team using the `/register` command.',
+            'You can register for a different team in the channel <#1372921837058789520>.',
         );
       }
     } catch (error: any) {
